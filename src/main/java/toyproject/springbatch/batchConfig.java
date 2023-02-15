@@ -75,7 +75,8 @@ public class batchConfig {
                 .build();
     }
 
-    private ListItemReader<String> reader() {
+    @Bean
+    public ListItemReader<String> reader() {
         logger.info(":::: start reader ::::");
         List<String> list = new ArrayList<>();
         list.add("test-data1");
@@ -88,14 +89,16 @@ public class batchConfig {
      * I: ItemReader에서 받아온 파라미터 타입
      * O: ItemWriter로 반활할 파라미터 타입
      */
-    private ItemProcessor<String, String> processor() {
+    @Bean
+    public ItemProcessor<String, String> processor() {
         return item -> {
             logger.info(":::: start processor ::::");
             return item.toString();
         };
     }
 
-    private ItemWriter<String> writer() {
+    @Bean
+    public ItemWriter<String> writer() {
         return items -> {
             logger.info(":::: start writer ::::");
             for(String item : items) {
