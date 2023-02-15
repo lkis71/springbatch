@@ -3,13 +3,15 @@ package toyproject.springbatch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.*;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 /**
  * batch job을 빌드하기 위한 기본 구성을 제공
- * stepScope 및 JobScope 인스턴스 생성
+ * 기본적으로 stepScope 및 JobScope 인스턴스 생성
  * 여러 빈 생성
  *  -> JobRepository
  *  -> JobLauncher
@@ -40,7 +42,7 @@ public class batchConfig {
 
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("testJob1")
+        return jobBuilderFactory.get("testJob3")
 //                .preventRestart() //잡의 오류 발생시 재시작을 방지(오류발생)
                 .start(step())
                 .build();
@@ -65,18 +67,19 @@ public class batchConfig {
      */
     @Bean
     public Step step() {
-        return stepBuilderFactory.get("testStep1")
+        return stepBuilderFactory.get("testStep3")
                 .<String, String>chunk(30)
-                .reader(scrapper())
+                .reader(reader())
                 .processor(processor())
-                .writer(insert())
+                .writer(writer())
                 .build();
     }
 
-    @Bean
-    public ListItemReader<String> scrapper() {
-        logger.info(":::: start scrapping ::::");
+    private ListItemReader<String> reader() {
+        logger.info(":::: start reader ::::");
         List<String> list = new ArrayList<>();
+        list.add("test-data1");
+        list.add("test-data2");
         return new ListItemReader<>(list);
     }
 
@@ -85,17 +88,19 @@ public class batchConfig {
      * I: ItemReader에서 받아온 파라미터 타입
      * O: ItemWriter로 반활할 파라미터 타입
      */
-    public ItemProcessor<String, String> processor() {
+    private ItemProcessor<String, String> processor() {
         return item -> {
             logger.info(":::: start processor ::::");
             return item.toString();
         };
     }
 
-    public JpaItemWriter<String> insert() {
-        JpaItemWriter<String> writer = new JpaItemWriter<>();
-        logger.info(":::: start insert ::::");
-        writer.setEntityManagerFactory(entityManagerFactory);
-        return writer;
+    private ItemWriter<String> writer() {
+        return items -> {
+            logger.info(":::: start writer ::::");
+            for(String item : items) {
+                logger.info(item);
+            }
+        };
     }
 }
