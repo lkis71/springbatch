@@ -1,6 +1,8 @@
 package toyproject.springbatch;
 
 import lombok.RequiredArgsConstructor;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -8,12 +10,13 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import javax.persistence.EntityManagerFactory;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,19 +36,29 @@ import java.util.logging.Logger;
  *  -> JobRepository와 JobLauncher 인스턴스에서 사용
  */
 @EnableBatchProcessing
-public class batchConfig {
+public class batchConfig extends QuartzJobBean {
 
     private final Logger logger = Logger.getLogger("batchConfig");
     private final EntityManagerFactory entityManagerFactory;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
+    /**
+     * JobInstance
+     * 논리적인 Job의 실행의 단위
+     */
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("testJob3")
-//                .preventRestart() //잡의 오류 발생시 재시작을 방지(오류발생)
+        return jobBuilderFactory.get("job")
                 .start(step())
                 .build();
+    }
+
+    @Override
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        LocalDateTime dateTime = LocalDateTime.now();
+        logger.info(dateTime.toString());
+        job();
     }
 
     /**
@@ -67,7 +80,7 @@ public class batchConfig {
      */
     @Bean
     public Step step() {
-        return stepBuilderFactory.get("testStep3")
+        return stepBuilderFactory.get("step")
                 .<String, String>chunk(30)
                 .reader(reader())
                 .processor(processor())
@@ -101,9 +114,22 @@ public class batchConfig {
     public ItemWriter<String> writer() {
         return items -> {
             logger.info(":::: start writer ::::");
-            for(String item : items) {
+            for (String item : items) {
                 logger.info(item);
             }
         };
     }
+
+    /**
+     * ExecutionContext
+     * StepExecution 개체 또는 JobExecution 개체로 범위가 지정된 영구 상태를 저장할 장소를 제공하기 위해 프레임워크에서 유지되고 제어되는 키/값 쌍의 컬렉션
+     * Quartz에 익숙한 사용자에게는 JobDataMap과 매우 유사
+     *
+     * JobRepository
+     * JobLauncher, Job, Step 구현을 위한 CRUD 작업을 제공한다.
+     * 작업이 처음 시작되면 저장소에서 JobExecution을 가져온다.
+     * 또한 실행 과정에서 StepExecution 및 JobExecution 구현은 레포지토리에 전달되어 유지된다.
+     *
+     * JobLauncher
+     * JobParameters 집합으로 Job을 시작하기 위한 간단한 인터페이스스     */
 }
