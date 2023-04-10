@@ -53,7 +53,7 @@ public class BatchConfig {
     public Step step() {
         Calendar calendar = Calendar.getInstance();
         return stepBuilderFactory.get("step" + dateFormatter.format(calendar.getTime()))
-                .<String, String>chunk(chunkSize)
+                .<String, String>chunk(10)
                 .reader(reader())
                 .processor(processor())
                 .writer(writer())
