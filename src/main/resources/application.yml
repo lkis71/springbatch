@@ -9,12 +9,22 @@ spring:
     password: 9156
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+#  datasource-blog:
+#    jdbc-url: jdbc:h2:tcp://localhost/~/tobi
+#    username: root
+#    password: 9156
+#    driver-class-name: org.h2.Driver
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 2000
+        order_inserts: true
+        order_updates: true
 
   batch:
     jdbc:
