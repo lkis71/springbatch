@@ -20,15 +20,20 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
+#        format_sql: true
         jdbc:
+          # 한번에 나가는 배치 개수 -> 100개의 insert를 1개로 보낸다.
           batch_size: 2000
+        ## bulk insert 옵션 ##
+        # 정렬 옵션
         order_inserts: true
         order_updates: true
 
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      enabled: true
 
 logging:
   level:

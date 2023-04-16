@@ -2,6 +2,7 @@ package toyproject.springbatch.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import toyproject.springbatch.dto.TourGallery;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,7 +21,7 @@ public class TourListApiConnection {
         try {
             StringBuffer apiUrl = new StringBuffer();
             apiUrl.append("http://apis.data.go.kr/B551011/PhotoGalleryService1/galleryList1");
-            apiUrl.append("?numOfRows=").append("10");
+            apiUrl.append("?numOfRows=").append("10000");
             apiUrl.append("&pageNo=").append("1");
             apiUrl.append("&MobileOS=").append("ETC");
             apiUrl.append("&MobileApp=").append("AppTest");

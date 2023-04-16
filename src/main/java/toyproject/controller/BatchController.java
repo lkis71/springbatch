@@ -1,14 +1,21 @@
 package toyproject.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import toyproject.entity.User;
 import toyproject.repository.batch.BatchRepository;
 import toyproject.service.BatchService;
+import toyproject.springbatch.api.TourListApiConnection;
+import toyproject.springbatch.dto.TourGallery;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,15 +25,21 @@ public class BatchController {
     private final BatchRepository batchRepository;
 
     @PostMapping("/user")
-    public void saveUser() {
+    public List<TourGallery> saveUser() throws JsonProcessingException {
 
-        List<User> users = new ArrayList<>();
+        JSONObject tourList = TourListApiConnection.getTourList();
+        JSONObject items = tourList.getJSONObject("items");
+        JSONArray itemArr = items.getJSONArray("item");
 
-        for (int i=1; i<=10000; i++) {
-            User user = User.createUser(Long.parseLong(String.valueOf(i)), "user" + i);
-            users.add(user);
+        List<TourGallery> tourGalleries = new ArrayList<>();
+
+        for (Object item : itemArr) {
+            TourGallery tourGallery = new ObjectMapper().readValue(item.toString(), TourGallery.class);
+            tourGalleries.add(tourGallery);
         }
 
-        batchRepository.saveAll(users);
+        batchRepository.saveAll(tourGalleries);
+
+        return tourGalleries;
     }
 }

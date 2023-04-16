@@ -1,34 +1,67 @@
 package toyproject.springbatch.dto;
 
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TourGallery {
 
+    @Id
+    @Column(name = "content_id")
     private String galContentId;
+
+    @Column(name = "content_type_id")
     private String galContentTypeId;
+
+    @Column(name = "title")
     private String galTitle;
+
+    @Column(name = "web_image_url")
     private String galWebImageUrl;
-    private String galCreatedtime;
-    private String galModifiedtime;
+
+    @Column(name = "photography_month")
     private String galPhotographyMonth;
+
+    @Column(name = "photography_location")
     private String galPhotographyLocation;
 
-    public static TourGallery setTourGalleries(JSONObject object) {
+    @Column(name = "photographer")
+    private String galPhotographer;
 
-        TourGallery tourGallery = new TourGallery();
-        tourGallery.galContentId = String.valueOf(object.get("galContentId"));
-        tourGallery.galContentTypeId = String.valueOf(object.get("galContentTypeId"));
-        tourGallery.galTitle = String.valueOf(object.get("galTitle"));
-        tourGallery.galWebImageUrl = String.valueOf(object.get("galWebImageUrl"));
-        tourGallery.galCreatedtime = String.valueOf(object.get("galCreatedtime"));
-        tourGallery.galModifiedtime = String.valueOf(object.get("galModifiedtime"));
-        tourGallery.galPhotographyMonth = String.valueOf(object.get("galPhotographyMonth"));
-        tourGallery.galPhotographyLocation = String.valueOf(object.get("galPhotographyLocation"));
+    @Column(name = "searchKeyword")
+    private String galSearchKeyword;
 
-        return tourGallery;
+    @Column(name = "create_time")
+    private String galCreatedtime;
+
+    @Column(name = "modified_time")
+    private String galModifiedtime;
+
+    @Builder
+    public TourGallery(String galContentId, String galContentTypeId, String galTitle, String galWebImageUrl, String galPhotographyMonth, String galPhotographyLocation, String galPhotographer, String galSearchKeyword, String galCreatedtime, String galModifiedtime) {
+        this.galContentId = galContentId;
+        this.galContentTypeId = galContentTypeId;
+        this.galTitle = galTitle;
+        this.galWebImageUrl = galWebImageUrl;
+        this.galPhotographyMonth = galPhotographyMonth;
+        this.galPhotographyLocation = galPhotographyLocation;
+        this.galPhotographer = galPhotographer;
+        this.galSearchKeyword = galSearchKeyword;
+        this.galCreatedtime = galCreatedtime;
+        this.galModifiedtime = galModifiedtime;
     }
 }
