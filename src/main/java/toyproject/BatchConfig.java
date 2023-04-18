@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 @EnableBatchProcessing
 public class BatchConfig {
 
-    public static final String JOB_NAME = "springBatch15";
+    public static final String JOB_NAME = "springBatch22";
 
     private final Logger logger = Logger.getLogger("BatchConfig");
 
@@ -54,16 +54,16 @@ public class BatchConfig {
     @Bean
     public Job job() {
         return jobBuilderFactory.get(JOB_NAME)
-                .start(step("대전"))
+                .start(step())
                 .build();
     }
 
     @Bean
     @JobScope
-    public Step step(@Value("#{jobParameters['title']}") String title) {
+    public Step step() {
         return stepBuilderFactory.get(JOB_NAME + "_step")
                 .<TourGallery, TourGallery>chunk(chunkSize)
-                .reader(reader(title))
+                .reader(reader(null))
                 .processor(processor())
                 .writer(writer())
                 .build();
@@ -73,10 +73,8 @@ public class BatchConfig {
     @StepScope
     public ItemReader<TourGallery> reader(@Value("#{jobParameters['title']}") String title) {
 
-        logger.info(":::: start reader ::::");
-
         Map<String, Object> paramValue = new HashMap<>();
-        paramValue.put("title", "%대전%");
+        paramValue.put("title", "%"+title+"%");
 
         return new JpaPagingItemReaderBuilder<TourGallery>()
                 .name("test")
@@ -87,9 +85,6 @@ public class BatchConfig {
                 .build();
     }
 
-    // build로 수정하는 방법은 애초에 존재하지 않음
-    // build는 새 객체를 생성하기 때문에 수정이 아닌 등록만 됨
-    
     @Bean
     public ItemProcessor<TourGallery, TourGallery> processor() {
         return item -> {
